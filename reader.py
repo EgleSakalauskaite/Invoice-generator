@@ -1,11 +1,14 @@
 import pandas as pd
 import os
 import win32com.client as win32
+import win32com.client.gencache
+win32com.client.gencache.is_readonly = False
+win32com.client.gencache.Rebuild()
 
 invoice_form = pd.read_excel('Forma.xlsx', header=None)
 schools = pd.read_excel('Sąrašas.xlsx', sheet_name=None, header=None)
-month_numeric = '04'
-month_text = 'balandžio mėn.'
+month_numeric = '05'
+month_text = 'gegužės mėn.'
 invoice_No = 1
 
 for school_name, students in schools.items():
@@ -25,11 +28,11 @@ for school_name, students in schools.items():
         invoice.iloc[17, 1] = full_student_name
         invoice.iloc[19, 0] = 'Pastabos: Mokėjimo paskirtyje įrašyti: ' + full_student_name
         invoice.iloc[20, 0] = 'Suma žodžiais: ' + price_text + ' eurų 00 ct'
-        invoice.iloc[21, 0] = 'Sąskaitą apmokėti iki 2025.' + month_numeric + '.15'
+        invoice.iloc[21, 0] = 'Sąskaitą apmokėti iki 2025.' + month_numeric + '.30'
 
         temp_excel = os.path.join('sąskaitos_exl', f"{full_student_name}.xlsx")
         invoice.to_excel(temp_excel, index=False, header=False)
-        excel = win32.gencache.EnsureDispatch('Excel.Application')
+        excel = win32com.client.Dispatch('Excel.Application')
         wb = excel.Workbooks.Open(os.path.abspath(temp_excel))
         ws = wb.Sheets(1)
         ws.Columns("A").ColumnWidth = 10
